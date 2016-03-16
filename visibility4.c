@@ -28,7 +28,7 @@ void free_t_list(struct t_list *t_list)
     mxFree(t_list);
 }
 
-#define REALLOC_INCREMENT 100000
+#define REALLOC_INCREMENT 1000000
 
 void append_t_list(struct t_list *tl, uint32_t el1, uint32_t el2)
 {
