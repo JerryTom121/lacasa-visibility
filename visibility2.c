@@ -1,9 +1,17 @@
 #include <stdint.h>
-#include "mex.h"
+#include "/usr/local/MATLAB/R2016a/extern/include/mex.h"
 // #include "matrix.h"
+
+int foo(int a, int b)
+{
+    return a + b;
+}
+
 
 void mexFunction(int nl, mxArray *pl[], int nr, const mxArray *pr[])
 {
+    foo("asdf", 3);
+    
     /* check arguments */
     if (nr != 1 || nl != 1)
         mexErrMsgTxt("[visibility_matrix] = visibility(time_series);");
@@ -19,10 +27,10 @@ void mexFunction(int nl, mxArray *pl[], int nr, const mxArray *pr[])
           , *mKout = mxDuplicateArray(mK)
 	  ;
 
-    double *K = mxGetPr(mK)
-	 , *T = mxGetPr(mT)
-	 , *Kin = mxGetPr(mKin)
-	 , *Kout = mxGetPr(mKout)
+    double * restrict K = mxGetPr(mK)
+	 , * restrict T = mxGetPr(mT)
+	 , * restrict Kin = mxGetPr(mKin)
+	 , * restrict Kout = mxGetPr(mKout)
 	 ;
 
     /* Lacasa's algorithm */
@@ -32,6 +40,8 @@ void mexFunction(int nl, mxArray *pl[], int nr, const mxArray *pr[])
         Kin[i+1] = Kin[i+1] + 1;
         K[i] = K[i] + 1;
         K[i+1] = K[i+1] + 1;
+        append(T, g, i);
+        append(T, G, i + 1);
         T[g] = i;
         T[g+N2] = i + 1;
         g++;
@@ -45,13 +55,19 @@ void mexFunction(int nl, mxArray *pl[], int nr, const mxArray *pr[])
                 Kin[i+j] = Kin[i+j] + 1;
                 K[i] = K[i] + 1;
                 K[i+j] = K[i+j] + 1;
+                append(T, g, i);
+                append(T, G, i + 1);
+                /*
                 T[g] = i;
                 T[g+N2] = i+j;
+                */
                 g++;
                 criterio = pendiente;
             }
         }
     }
+
+    // convert T list to index matrix
 
     /* clean up */
     mxDestroyArray(mK);
